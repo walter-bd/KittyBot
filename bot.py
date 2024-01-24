@@ -3,8 +3,9 @@
 import os
 import dotenv, aiohttp
 import hikari, lightbulb
-
 import emoji_cache
+from chatterbotpro import ChatBot
+from chatterbotpro import languages
 
 dotenv.load_dotenv()
 
@@ -15,6 +16,36 @@ bot = lightbulb.BotApp(
     intents=hikari.Intents.ALL,
     default_enabled_guilds=tuple(int(v) for v in os.environ["DEFAULT_GUILDS"].split(','))
 )
+
+
+if not os.path.exists(os.environ.get('ChatBotDB', '/data/chatbot.sqlite3')):
+    from chatterbotpro.trainers import ChatterBotCorpusTrainer
+    # from chatterbotpro.trainers import ListTrainer
+    kittychat = ChatBot('Kitty', 
+                        storage_adapter='chatterbotpro.storage.SQLStorageAdapter',
+                        database_uri='sqlite:///'+os.environ.get('ChatBotDB', '/data/chatbot.sqlite3'),
+                        logic_adapters=[
+                            'chatterbotpro.logic.BestMatch'
+                        ],tagger_language=languages.ENG)
+    # Create a new trainer for the chatbot
+    trainer = ChatterBotCorpusTrainer(kittychat)
+
+    # Train based on the english corpus
+    trainer.train("chatterbot.corpus.english")
+
+    # Train based on english greetings corpus
+    trainer.train("chatterbot.corpus.english.greetings")
+
+    # Train based on the english conversations corpus
+    trainer.train("chatterbot.corpus.english.conversations")
+    
+    # Train on specifics
+    # trainer.train([
+    # 'Hello, how are you?',
+    # 'I am doing well.',
+    # 'That is good to hear.',
+    # 'Thank you'
+    # ]) 
 
 
 @bot.listen(hikari.StartedEvent)

@@ -1,6 +1,8 @@
 import re, datetime, hashlib
 import hikari, lightbulb
-
+from chatterbotpro import ChatBot
+from chatterbotpro import languages
+import os
 plugin = lightbulb.Plugin("Snark")
 
 eight_ball_responses = [ "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes, definitely.",
@@ -8,6 +10,18 @@ eight_ball_responses = [ "It is certain.", "It is decidedly so.", "Without a dou
                "Yes.", "Signs point to yes.", "Reply hazy, try again.", "Ask again later.",
                "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.",
                "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very Doubtful."]
+
+
+kittychat = ChatBot('Kitty', 
+                    storage_adapter='chatterbotpro.storage.SQLStorageAdapter',
+                    database_uri='sqlite:///'+os.environ.get('ChatBotDB', '/data/chatbot.sqlite3'),
+                    tagger_language=languages.ENG,
+                    logic_adapters=[
+                        {
+                          'import_path': 'chatterbotpro.logic.BestMatch',
+                          'default_response': 'I am sorry, but I do not understand.'
+                        },
+                    ])
 
 def choose_eightball_response(message):
     # Add current date down to hour precision to vary the response periodically
@@ -29,7 +43,8 @@ async def main(event) -> None:
     regexp = re.compile(r'(\S|\s)\?(\s|$)')
     response = None
     if regexp.search(messageContent):
-        response = choose_eightball_response(messageContent)
+        #response = choose_eightball_response(messageContent)
+        response = kittychat.get_response(messageContent)
     elif find_whole_word('broken', messageContent):
         response = f"No {event.author.mention}, you're broken :disguised_face:"
     elif find_whole_word('thanks', messageContent) or find_whole_word('thank', messageContent):

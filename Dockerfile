@@ -5,6 +5,8 @@ RUN apt update -y && apt upgrade -y \
     && apt install libfreetype6-dev libxft-dev fortune -y
 COPY requirements.txt /home
 RUN pip install -r /home/requirements.txt
+RUN pip install https://github.com/lucasalberto01/chatterbot-pro/archive/refs/heads/master.zip
+RUN python -m spacy download en_core_web_sm
 COPY --chown=$UID:$GID . /home/
 RUN mkdir /data  && chown -R $UID:$GID /data
 ENV HOME /home
