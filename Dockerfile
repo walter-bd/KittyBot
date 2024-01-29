@@ -7,6 +7,7 @@ COPY requirements.txt /home
 RUN pip install -r /home/requirements.txt
 COPY --chown=$UID:$GID . /home/
 RUN mkdir /data  && chown -R $UID:$GID /data
+RUN mkdir -p /home/.cache && chown -R $UID:$GID /home/.cache
 ENV HOME /home
 ENV FORTUNE_DIRECTORY /usr/share/games/fortunes
 ENV KITTY_DB /data/persist.sqlite

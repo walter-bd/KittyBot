@@ -9,9 +9,11 @@ services:
       - ".env"
     volumes:
       - kitty-db:/data
+      - cache:/home/.cache
 
 networks:
   network:
 
 volumes:
   kitty-db:
+  cache:
